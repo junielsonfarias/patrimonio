@@ -1,0 +1,218 @@
+// Schema do Sistema de Gestão Patrimonial - SQLite
+// Prefeitura Municipal
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Modelo de Secretaria
+model Secretaria {
+  id                    String           @id @default(uuid())
+  codigo                String           @unique
+  nome                  String
+  descricao             String?
+  status                String           @default("ATIVA") // ATIVA, INATIVA, EXTINTA
+  dataInicio            DateTime
+  dataFim               DateTime?
+  motivoInativacao      String?
+  secretariaSuccessora  String?
+  responsavel           String
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+
+  // Relacionamentos
+  funcionarios          Funcionario[]
+  patrimonios           Patrimonio[]
+  transferenciasOrigem  Transferencia[]  @relation("SecretariaOrigem")
+  transferenciasDestino Transferencia[]  @relation("SecretariaDestino")
+
+  @@index([codigo])
+  @@index([status])
+  @@map("secretarias")
+}
+
+// Modelo de Funcionário
+model Funcionario {
+  id            String           @id @default(uuid())
+  nome          String
+  cpf           String           @unique
+  email         String?
+  telefone      String?
+  cargo         String
+  setor         String
+  secretariaId  String
+  matricula     String?
+  status        String           @default("ATIVO") // ATIVO, INATIVO, AFASTADO, EXONERADO
+  dataAdmissao  DateTime
+  dataExoneracao DateTime?
+  observacoes   String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  // Relacionamentos
+  secretaria    Secretaria       @relation(fields: [secretariaId], references: [id], onDelete: Cascade)
+  patrimonios   Patrimonio[]
+  manutencoes   Manutencao[]
+  transferencias Transferencia[]
+  logAtividades LogAtividade[]
+  usuario       Usuario?
+
+  @@index([cpf])
+  @@index([secretariaId])
+  @@map("funcionarios")
+}
+
+// Modelo de Patrimônio
+model Patrimonio {
+  id                  String                @id @default(uuid())
+  numero              String                @unique
+  codigoSecretaria    String
+  descricao           String
+  categoria           String
+  subcategoria        String?
+  marca               String?
+  modelo              String?
+  numeroSerie         String?
+  valor               Float
+  valorAtual          Float
+  dataAquisicao       DateTime
+  vidaUtil            Int                   @default(10)
+  secretariaId        String
+  localizacao         String
+  responsavelId       String
+  status              String                @default("ATIVO") // ATIVO, INATIVO, BAIXADO
+  situacao            String                @default("NOVO") // NOVO, RECONDICIONADO, USADO, TRANSFERIDO, DOADO, EXTRAVIADO
+  estadoConservacao   String                @default("BOM") // EXCELENTE, BOM, REGULAR, RUIM
+  observacoes         String?
+  fotos               String                @default("")
+  qrCode              String?
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+
+  // Relacionamentos
+  secretaria          Secretaria            @relation(fields: [secretariaId], references: [id], onDelete: Cascade)
+  responsavel         Funcionario           @relation(fields: [responsavelId], references: [id], onDelete: Cascade)
+  documentos          Documento[]
+  manutencoes         Manutencao[]
+  transferencias      Transferencia[]
+  logAtividades       LogAtividade[]
+
+  @@index([numero])
+  @@index([codigoSecretaria])
+  @@index([secretariaId])
+  @@index([responsavelId])
+  @@index([status])
+  @@index([categoria])
+  @@map("patrimonios")
+}
+
+// Modelo de Documento
+model Documento {
+  id            String         @id @default(uuid())
+  patrimonioId  String
+  nome          String
+  tipo          String         // NOTA_FISCAL, GARANTIA, MANUAL, OUTRO
+  url           String
+  dataVencimento DateTime?
+  createdAt     DateTime       @default(now())
+
+  // Relacionamentos
+  patrimonio    Patrimonio     @relation(fields: [patrimonioId], references: [id], onDelete: Cascade)
+
+  @@map("documentos")
+}
+
+// Modelo de Manutenção
+model Manutencao {
+  id            String         @id @default(uuid())
+  patrimonioId  String
+  funcionarioId String
+  data          DateTime
+  tipo          String         // PREVENTIVA, CORRETIVA
+  descricao     String
+  valor         Float?
+  responsavel   String
+  createdAt     DateTime       @default(now())
+
+  // Relacionamentos
+  patrimonio    Patrimonio     @relation(fields: [patrimonioId], references: [id], onDelete: Cascade)
+  funcionario   Funcionario    @relation(fields: [funcionarioId], references: [id], onDelete: Cascade)
+
+  @@map("manutencoes")
+}
+
+// Modelo de Transferência
+model Transferencia {
+  id                            String              @id @default(uuid())
+  patrimonioId                  String
+  secretariaOrigemId            String
+  secretariaDestinoId           String
+  responsavelTransferenciaId    String
+  supervisorAprovacaoId         String?
+  motivoTransferencia           String
+  justificativaSecretariaInativa String?
+  dataTransferencia             DateTime?
+  status                        String              @default("PENDENTE") // PENDENTE, APROVADA, REJEITADA
+  createdAt                     DateTime            @default(now())
+
+  // Relacionamentos
+  patrimonio                    Patrimonio          @relation(fields: [patrimonioId], references: [id], onDelete: Cascade)
+  secretariaOrigem              Secretaria          @relation("SecretariaOrigem", fields: [secretariaOrigemId], references: [id])
+  secretariaDestino             Secretaria          @relation("SecretariaDestino", fields: [secretariaDestinoId], references: [id])
+  responsavelTransferencia      Funcionario         @relation(fields: [responsavelTransferenciaId], references: [id])
+
+  @@index([status])
+  @@index([patrimonioId])
+  @@map("transferencias")
+}
+
+// Modelo de Log de Atividade
+model LogAtividade {
+  id            String    @id @default(uuid())
+  usuarioId     String
+  patrimonioId  String?
+  acao          String
+  entidade      String
+  entidadeId    String
+  campo         String
+  valorAnterior String?
+  valorNovo     String?
+  ip            String
+  userAgent     String
+  timestamp     DateTime  @default(now())
+  sessaoId      String
+
+  // Relacionamentos
+  funcionario   Funcionario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  patrimonio    Patrimonio? @relation(fields: [patrimonioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+  @@index([timestamp])
+  @@map("log_atividades")
+}
+
+// Modelo de Usuário do Sistema
+model Usuario {
+  id                String      @id @default(uuid())
+  nome              String
+  email             String      @unique
+  senha             String
+  role              String      @default("OPERADOR") // SUPERVISOR, ADMINISTRADOR, OPERADOR, CONSULTOR
+  funcionarioId     String?     @unique
+  isActive          Boolean     @default(true)
+  lastLogin         DateTime?
+  loginAttempts     Int         @default(0)
+  lockedUntil       DateTime?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  // Relacionamentos
+  funcionario       Funcionario? @relation(fields: [funcionarioId], references: [id])
+
+  @@map("usuarios")
+}

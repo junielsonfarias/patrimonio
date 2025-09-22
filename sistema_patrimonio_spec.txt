@@ -1,0 +1,503 @@
+# Sistema de Gestão Patrimonial - Prefeitura Municipal
+# Especificação completa para desenvolvimento com Cursor AI / Skip
+
+project:
+  name: "sistema-gestao-patrimonial"
+  description: "Sistema completo de gestão patrimonial para prefeituras municipais"
+  version: "1.0.0"
+  type: "fullstack-web-app"
+
+# Stack Tecnológica
+tech_stack:
+  frontend:
+    framework: "React 18"
+    language: "TypeScript"
+    styling: "Tailwind CSS"
+    state_management: "React Query + Zustand"
+    validation: "Zod"
+    routing: "React Router v6"
+    ui_components: "Headless UI + Heroicons"
+    charts: "Recharts"
+    
+  backend:
+    runtime: "Node.js 20"
+    framework: "Express.js"
+    language: "TypeScript"
+    orm: "Prisma"
+    validation: "Zod"
+    authentication: "JWT + bcrypt"
+    file_upload: "multer"
+    logging: "Winston"
+    
+  database:
+    primary: "PostgreSQL 15"
+    cache: "Redis 7"
+    
+  desktop_app:
+    framework: "Electron"
+    base: "React + TypeScript"
+    
+  mobile_app:
+    framework: "React Native"
+    navigation: "React Navigation v6"
+    
+  deployment:
+    containerization: "Docker + Docker Compose"
+    process_manager: "PM2"
+    web_server: "Nginx"
+    monitoring: "Prometheus + Grafana"
+    ci_cd: "GitHub Actions"
+
+# Estrutura de Usuários
+user_roles:
+  supervisor:
+    permissions:
+      - "full_system_access"
+      - "create_secretarias"
+      - "manage_users"
+      - "approve_transfers_inactive_secretarias"
+      - "system_configuration"
+      - "view_all_reports"
+      
+  administrador:
+    permissions:
+      - "manage_assigned_secretarias"
+      - "create_locations"
+      - "manage_patrimonio_in_secretarias"
+      - "transfer_patrimonio"
+      - "view_secretaria_reports"
+      
+  operador:
+    permissions:
+      - "create_patrimonio"
+      - "edit_patrimonio"
+      - "upload_photos_documents"
+      - "basic_reports"
+      
+  consultor:
+    permissions:
+      - "view_patrimonio"
+      - "view_reports"
+      - "export_data"
+
+# Modelo de Dados Principal
+data_models:
+  secretaria:
+    fields:
+      id: "string (UUID)"
+      codigo: "string (2 digits, unique, immutable)"
+      nome: "string (required)"
+      descricao: "string (optional)"
+      status: "enum: ATIVA | INATIVA | EXTINTA"
+      data_inicio: "Date (required)"
+      data_fim: "Date (optional)"
+      motivo_inativacao: "string (optional)"
+      secretaria_successora: "string (FK, optional)"
+      responsavel: "string (required)"
+      created_at: "Date"
+      updated_at: "Date"
+      
+  funcionario:
+    fields:
+      id: "string (UUID)"
+      nome: "string (required)"
+      cpf: "string (unique, required)"
+      email: "string (optional)"
+      telefone: "string (optional)"
+      cargo: "string (required)"
+      setor: "string (required)"
+      secretaria: "string (FK, required)"
+      matricula: "string (optional)"
+      status: "enum: ATIVO | INATIVO | AFASTADO | EXONERADO"
+      data_admissao: "Date (required)"
+      data_exoneracao: "Date (optional)"
+      observacoes: "text (optional)"
+      created_at: "Date"
+      updated_at: "Date"
+      
+  patrimonio:
+    fields:
+      id: "string (UUID)"
+      numero: "string (format: YYYYNNNNNNN - unique)"
+      codigo_secretaria: "string (2 digits)"
+      descricao: "string (required)"
+      categoria: "string (required)"
+      subcategoria: "string (optional)"
+      marca: "string (optional)"
+      modelo: "string (optional)"
+      numero_serie: "string (optional)"
+      valor: "decimal (required)"
+      valor_atual: "decimal (calculated)"
+      data_aquisicao: "Date (required)"
+      vida_util: "integer (years)"
+      secretaria_id: "string (FK, required)"
+      localizacao: "string (required)"
+      responsavel_id: "string (FK, required)"
+      status: "enum: ATIVO | INATIVO | BAIXADO"
+      situacao: "enum: NOVO | RECONDICIONADO | USADO | TRANSFERIDO | DOADO | EXTRAVIADO"
+      estado_conservacao: "enum: EXCELENTE | BOM | REGULAR | RUIM"
+      observacoes: "text (optional)"
+      fotos: "string[] (URLs)"
+      qr_code: "string (generated)"
+      created_at: "Date"
+      updated_at: "Date"
+      
+  documento:
+    fields:
+      id: "string (UUID)"
+      patrimonio_id: "string (FK)"
+      nome: "string (required)"
+      tipo: "enum: NOTA_FISCAL | GARANTIA | MANUAL | OUTRO"
+      url: "string (required)"
+      data_vencimento: "Date (optional)"
+      created_at: "Date"
+      
+  manutencao:
+    fields:
+      id: "string (UUID)"
+      patrimonio_id: "string (FK)"
+      data: "Date (required)"
+      tipo: "enum: PREVENTIVA | CORRETIVA"
+      descricao: "text (required)"
+      valor: "decimal (optional)"
+      responsavel: "string (required)"
+      created_at: "Date"
+      
+  transferencia:
+    fields:
+      id: "string (UUID)"
+      patrimonio_id: "string (FK)"
+      secretaria_origem: "string (FK)"
+      secretaria_destino: "string (FK)"
+      responsavel_transferencia: "string (FK)"
+      supervisor_aprovacao: "string (FK, optional)"
+      motivo_transferencia: "text (required)"
+      justificativa_secretaria_inativa: "text (conditional)"
+      data_transferencia: "Date"
+      status: "enum: PENDENTE | APROVADA | REJEITADA"
+      created_at: "Date"
+      
+  log_atividade:
+    fields:
+      id: "string (UUID)"
+      usuario_id: "string (FK)"
+      acao: "string (required)"
+      entidade: "string (required)"
+      entidade_id: "string (required)"
+      campo: "string (required)"
+      valor_anterior: "jsonb (optional)"
+      valor_novo: "jsonb (optional)"
+      ip: "string (required)"
+      user_agent: "string (required)"
+      timestamp: "Date"
+      sessao_id: "string (required)"
+
+# Regras de Negócio Principais
+business_rules:
+  numeracao_patrimonio:
+    format: "YYYYNNNNNNN"
+    description: "Ano (4) + Sequência (6 digits)"
+    reset_annual: true
+    unique_per_year: true
+    
+  depreciacao:
+    method: "linear"
+    table:
+      VEICULOS: 
+        vida_util: 5
+        taxa_anual: 0.20
+      MOVEIS_UTENSILIOS:
+        vida_util: 10
+        taxa_anual: 0.10
+      EQUIPAMENTOS_INFORMATICA:
+        vida_util: 4
+        taxa_anual: 0.25
+      MAQUINAS_EQUIPAMENTOS:
+        vida_util: 10
+        taxa_anual: 0.10
+      IMOVEIS:
+        vida_util: 25
+        taxa_anual: 0.04
+      INSTALACOES:
+        vida_util: 10
+        taxa_anual: 0.10
+        
+  secretarias:
+    codigo_immutable: true
+    status_lifecycle: "ATIVA → INATIVA → EXTINTA"
+    transferencia_inativa_requires_supervisor: true
+    
+  sincronizacao_offline:
+    strategy: "last_write_wins"
+    conflict_resolution: "sobrescrever_ultimo"
+    backup_before_sync: true
+
+# Funcionalidades Principais
+features:
+  patrimonio_management:
+    - "CRUD completo de patrimônios"
+    - "Upload múltiplas fotos"
+    - "Anexar documentos (PDF, DOC, etc)"
+    - "Geração automática QR Code"
+    - "Cálculo automático depreciação"
+    - "Histórico de manutenções"
+    - "Transferências entre secretarias"
+    - "Baixa patrimonial com justificativa"
+    
+  user_management:
+    - "Autenticação JWT"
+    - "Controle de acesso baseado em roles"
+    - "Gestão de funcionários/responsáveis"
+    - "Sessões com timeout configurável"
+    - "Log de todas as ações"
+    
+  reporting:
+    - "Relatórios por secretaria"
+    - "Relatórios por categoria"
+    - "Relatório de transferências"
+    - "Relatório de depreciação"
+    - "Relatório de inventário"
+    - "Relatórios personalizados"
+    - "Export PDF/Excel/CSV"
+    
+  dashboard:
+    - "Indicadores principais"
+    - "Gráficos interativos"
+    - "Alertas e notificações"
+    - "Estatísticas em tempo real"
+    - "Monitoramento de atividades"
+    
+  etiquetas:
+    - "Geração de etiquetas com QR Code"
+    - "Modelos personalizáveis"
+    - "Impressão em lote"
+    - "Preview em tempo real"
+    
+  inventario:
+    - "Agendamento automático"
+    - "Listas de verificação"
+    - "Scanner QR Code (mobile)"
+    - "Relatório de divergências"
+    
+  consulta_publica:
+    - "Página de transparência"
+    - "Busca por patrimônio"
+    - "QR Code público"
+    - "Estatísticas públicas"
+    - "API de dados abertos"
+    
+  offline_support:
+    - "App desktop (Electron)"
+    - "App mobile (React Native)"
+    - "Sincronização automática"
+    - "Cache local"
+
+# Configurações de Sistema
+system_config:
+  storage:
+    strategy: "evolutivo"
+    inicial: "local"
+    crescimento: "hibrido"
+    enterprise: "cloud"
+    
+  backup:
+    incremental: "every 6 hours"
+    completo: "weekly"
+    retencao: "90 days"
+    destinos: ["local", "cloud"]
+    
+  monitoring:
+    healthcheck: "30 seconds"
+    logs_retention: "1 year"
+    alerts: ["email", "dashboard"]
+    
+  security:
+    password_policy: "strong"
+    session_timeout: "8 hours"
+    login_attempts: "5 max"
+    audit_log: "7 years retention"
+
+# Estrutura de Arquivos Sugerida
+file_structure:
+  backend:
+    - "src/"
+    - "  controllers/"
+    - "  services/"
+    - "  models/"
+    - "  middleware/"
+    - "  routes/"
+    - "  utils/"
+    - "  config/"
+    - "  prisma/"
+    - "    schema.prisma"
+    - "  uploads/"
+    - "package.json"
+    - "tsconfig.json"
+    - "docker-compose.yml"
+    
+  frontend:
+    - "src/"
+    - "  components/"
+    - "    ui/"
+    - "    patrimonio/"
+    - "    secretarias/"
+    - "    usuarios/"
+    - "    relatorios/"
+    - "  pages/"
+    - "  hooks/"
+    - "  services/"
+    - "  utils/"
+    - "  types/"
+    - "  stores/"
+    - "package.json"
+    - "tailwind.config.js"
+    - "vite.config.ts"
+
+# APIs Principais
+api_endpoints:
+  auth:
+    - "POST /api/auth/login"
+    - "POST /api/auth/logout"
+    - "GET /api/auth/me"
+    - "POST /api/auth/refresh"
+    
+  patrimonio:
+    - "GET /api/patrimonio"
+    - "POST /api/patrimonio"
+    - "GET /api/patrimonio/:id"
+    - "PUT /api/patrimonio/:id"
+    - "DELETE /api/patrimonio/:id"
+    - "POST /api/patrimonio/:id/transfer"
+    - "POST /api/patrimonio/:id/baixa"
+    - "POST /api/patrimonio/:id/upload"
+    
+  secretarias:
+    - "GET /api/secretarias"
+    - "POST /api/secretarias"
+    - "PUT /api/secretarias/:id"
+    - "PUT /api/secretarias/:id/status"
+    
+  funcionarios:
+    - "GET /api/funcionarios"
+    - "POST /api/funcionarios"
+    - "PUT /api/funcionarios/:id"
+    - "GET /api/funcionarios/:id/patrimonios"
+    
+  relatorios:
+    - "GET /api/relatorios/patrimonio"
+    - "GET /api/relatorios/transferencias"
+    - "GET /api/relatorios/depreciacao"
+    - "POST /api/relatorios/personalizado"
+    
+  publico:
+    - "GET /api/public/patrimonio/:numero"
+    - "GET /api/public/search"
+    - "GET /api/public/estatisticas"
+
+# Configurações de Deploy
+deployment:
+  environment_variables:
+    - "DATABASE_URL"
+    - "REDIS_URL"
+    - "JWT_SECRET"
+    - "AWS_ACCESS_KEY_ID"
+    - "AWS_SECRET_ACCESS_KEY"
+    - "S3_BUCKET_NAME"
+    - "SMTP_HOST"
+    - "SMTP_PORT"
+    - "SMTP_USER"
+    - "SMTP_PASS"
+    
+  docker_services:
+    - "app (Node.js)"
+    - "postgres"
+    - "redis"
+    - "nginx"
+    - "prometheus"
+    - "grafana"
+    
+  ports:
+    app: 3000
+    postgres: 5432
+    redis: 6379
+    nginx: 80, 443
+    prometheus: 9090
+    grafana: 3001
+
+# Comandos de Desenvolvimento
+commands:
+  setup:
+    - "npm install"
+    - "npx prisma generate"
+    - "npx prisma migrate dev"
+    - "npm run seed"
+    
+  development:
+    - "npm run dev (backend)"
+    - "npm run dev (frontend)"
+    - "docker-compose up -d (services)"
+    
+  build:
+    - "npm run build"
+    - "npx prisma generate"
+    - "docker build -t patrimonio-app ."
+    
+  deploy:
+    - "docker-compose -f docker-compose.prod.yml up -d"
+    - "npm run migrate:prod"
+
+# Testes
+testing:
+  types:
+    - "unit tests (Jest)"
+    - "integration tests"
+    - "e2e tests (Playwright)"
+    
+  coverage:
+    target: "80%"
+    critical_paths: "95%"
+    
+# Documentação
+documentation:
+  api: "Swagger/OpenAPI"
+  user_manual: "Markdown + Screenshots"
+  deployment: "Docker + README"
+  
+# Requisitos Específicos para IA
+ai_instructions:
+  priorities:
+    1: "Segurança e auditoria completa"
+    2: "Interface intuitiva para funcionários públicos"
+    3: "Performance e escalabilidade"
+    4: "Compliance com transparência pública"
+    5: "Facilidade de manutenção"
+    
+  code_style:
+    - "TypeScript strict mode"
+    - "Functional programming patterns"
+    - "Clean code principles"
+    - "Comprehensive error handling"
+    - "Detailed comments in Portuguese"
+    
+  ui_ux:
+    - "Design system consistente"
+    - "Responsivo (mobile-first)"
+    - "Acessibilidade (WCAG 2.1)"
+    - "Loading states"
+    - "Error boundaries"
+    - "Confirmações para ações críticas"
+    
+  performance:
+    - "Lazy loading"
+    - "Code splitting"
+    - "Image optimization"
+    - "Database indexing"
+    - "Caching strategies"
+    
+  security:
+    - "Input validation"
+    - "SQL injection prevention"
+    - "XSS protection"
+    - "CSRF protection"
+    - "Rate limiting"
+    - "Audit logging"
