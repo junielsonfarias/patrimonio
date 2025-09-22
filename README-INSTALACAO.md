@@ -10,7 +10,7 @@
 
 ```bash
 # Baixar e executar o instalador
-wget https://raw.githubusercontent.com/seu-usuario/sistema-gestao-patrimonial/main/instalar-facil.sh
+wget https://raw.githubusercontent.com/junielsonfarias/patrimonio/principal/instalar-facil.sh
 chmod +x instalar-facil.sh
 ./instalar-facil.sh
 ```
@@ -32,7 +32,7 @@ chmod +x instalar-facil.sh
 
 ```bash
 # Baixar e executar o instalador completo
-wget https://raw.githubusercontent.com/seu-usuario/sistema-gestao-patrimonial/main/install.sh
+wget https://raw.githubusercontent.com/junielsonfarias/patrimonio/principal/install.sh
 chmod +x install.sh
 ./install.sh
 ```
@@ -41,7 +41,7 @@ chmod +x install.sh
 
 ```bash
 # Verificar se o servidor está pronto
-wget https://raw.githubusercontent.com/seu-usuario/sistema-gestao-patrimonial/main/check-dependencies.sh
+wget https://raw.githubusercontent.com/junielsonfarias/patrimonio/principal/check-dependencies.sh
 chmod +x check-dependencies.sh
 ./check-dependencies.sh
 ```
@@ -190,7 +190,7 @@ docker system prune -a
 
 ### Contato
 - **Email**: suporte@sistemapatrimonial.com
-- **GitHub**: [Issues](https://github.com/seu-usuario/sistema-gestao-patrimonial/issues)
+- **GitHub**: [Issues](https://github.com/junielsonfarias/patrimonio/issues)
 
 ---
 

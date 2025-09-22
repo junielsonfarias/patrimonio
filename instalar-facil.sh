@@ -272,18 +272,15 @@ setup_application() {
     sudo mkdir -p /opt/patrimonio
     sudo chown $USER:$USER /opt/patrimonio
     
-    # Baixar aplicação (assumindo que está em um repositório)
+    # Baixar aplicação do repositório GitHub
     print_message $YELLOW "⏳ Baixando código da aplicação..."
     
-    # Se você tiver o código em um repositório Git, descomente a linha abaixo:
-    # git clone https://github.com/seu-usuario/sistema-gestao-patrimonial.git /opt/patrimonio
+    git clone https://github.com/junielsonfarias/patrimonio.git /opt/patrimonio
     
-    # Por enquanto, vamos copiar do diretório atual
-    if [[ -d "." ]]; then
-        cp -r . /opt/patrimonio/
-    else
-        print_message $RED "❌ Código da aplicação não encontrado!"
-        print_message $YELLOW "Certifique-se de que você está executando este script no diretório correto"
+    # Verificar se o clone foi bem-sucedido
+    if [[ ! -d "/opt/patrimonio" ]]; then
+        print_message $RED "❌ Erro ao baixar código do repositório!"
+        print_message $YELLOW "Verifique sua conexão com a internet e tente novamente"
         exit 1
     fi
     

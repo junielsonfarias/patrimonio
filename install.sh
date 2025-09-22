@@ -286,16 +286,13 @@ setup_application() {
     TEMP_DIR=$(mktemp -d)
     cd $TEMP_DIR
     
-    # Baixar código (assumindo que está em um repositório)
-    # Se você tiver o código em um repositório Git, descomente a linha abaixo:
-    # git clone https://github.com/seu-usuario/sistema-gestao-patrimonial.git
+    # Baixar código do repositório GitHub
+    git clone https://github.com/junielsonfarias/patrimonio.git /opt/patrimonio
     
-    # Por enquanto, vamos copiar do diretório atual
-    if [[ -d "/tmp/patrimonio-source" ]]; then
-        sudo cp -r /tmp/patrimonio-source/* $APP_DIR/
-    else
-        print_message $YELLOW "⚠️  Copiando arquivos do diretório atual..."
-        sudo cp -r . $APP_DIR/
+    # Verificar se o clone foi bem-sucedido
+    if [[ ! -d "/opt/patrimonio" ]]; then
+        print_message $RED "❌ Erro ao baixar código do repositório!"
+        exit 1
     fi
     
     # Definir permissões

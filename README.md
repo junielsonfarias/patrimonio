@@ -44,12 +44,29 @@ Sistema completo de gestão patrimonial para prefeituras municipais, desenvolvid
 - Docker e Docker Compose
 - Git
 
-## 🚀 Instalação e Execução
+## ⚡ Instalação Rápida (VPS Linux)
+
+Para instalar em um servidor VPS Linux de forma automática:
+
+```bash
+# Baixar e executar o instalador
+wget https://raw.githubusercontent.com/junielsonfarias/patrimonio/principal/instalar-facil.sh
+chmod +x instalar-facil.sh
+./instalar-facil.sh
+```
+
+**Requisitos:** Ubuntu 20.04+ ou Debian 11+, 2GB RAM, 10GB disco
+
+📖 **[Guia Completo de Instalação](INSTALACAO.md)** | 📋 **[Guia Rápido](README-INSTALACAO.md)**
+
+---
+
+## 🚀 Instalação e Execução (Desenvolvimento)
 
 ### 1. Clone o repositório
 ```bash
-git clone <repository-url>
-cd sistema-gestao-patrimonial
+git clone https://github.com/junielsonfarias/patrimonio.git
+cd patrimonio
 ```
 
 ### 2. Configure as variáveis de ambiente
@@ -272,7 +289,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 Para suporte, entre em contato através de:
 - Email: suporte@sistemapatrimonial.com
-- Issues: [GitHub Issues](https://github.com/seu-usuario/sistema-gestao-patrimonial/issues)
+- Issues: [GitHub Issues](https://github.com/junielsonfarias/patrimonio/issues)
 
 ## 🎯 Roadmap
 

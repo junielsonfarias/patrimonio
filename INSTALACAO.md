@@ -31,7 +31,7 @@ Este guia fornece instruções detalhadas para instalar o Sistema de Gestão Pat
 
 ```bash
 # Baixar o script de instalação
-wget https://raw.githubusercontent.com/seu-usuario/sistema-gestao-patrimonial/main/install.sh
+wget https://raw.githubusercontent.com/junielsonfarias/patrimonio/principal/install.sh
 
 # Tornar o script executável
 chmod +x install.sh
@@ -124,8 +124,8 @@ sudo ufw --force enable
 sudo mkdir -p /opt/patrimonio
 sudo chown $USER:$USER /opt/patrimonio
 
-# Baixar código (substitua pela URL do seu repositório)
-git clone https://github.com/seu-usuario/sistema-gestao-patrimonial.git /opt/patrimonio
+# Baixar código do repositório GitHub
+git clone https://github.com/junielsonfarias/patrimonio.git /opt/patrimonio
 cd /opt/patrimonio
 ```
 
@@ -349,8 +349,8 @@ docker system prune -a
 
 ### Contato
 - **Email**: suporte@sistemapatrimonial.com
-- **Documentação**: [GitHub Wiki](https://github.com/seu-usuario/sistema-gestao-patrimonial/wiki)
-- **Issues**: [GitHub Issues](https://github.com/seu-usuario/sistema-gestao-patrimonial/issues)
+- **Documentação**: [GitHub Wiki](https://github.com/junielsonfarias/patrimonio/wiki)
+- **Issues**: [GitHub Issues](https://github.com/junielsonfarias/patrimonio/issues)
 
 ## 🔄 Atualizações
 
