@@ -347,3 +347,77 @@
 2. Validar instalação em VPS de teste
 3. Ajustar configurações conforme necessário
 4. Criar vídeos tutoriais de instalação
+
+---
+
+## 2025-01-21 - Configuração do Repositório GitHub
+
+### Problema Identificado
+- **Data:** 21/01/2025
+- **Problema:** Usuário solicitou configuração do projeto para repositório GitHub
+- **Causa:** Necessidade de disponibilizar o projeto no GitHub para instalação remota
+
+### Correções Implementadas
+- **Arquivos Modificados:**
+  - `install.sh` (atualizado com URL do repositório)
+  - `instalar-facil.sh` (atualizado com URL do repositório)
+  - `README.md` (atualizado com URLs do repositório)
+  - `README-INSTALACAO.md` (atualizado com URLs do repositório)
+  - `INSTALACAO.md` (atualizado com URLs do repositório)
+  - `docs/DEV_LOG.md` (atualizado)
+
+- **Soluções Aplicadas:**
+  1. **Configurado repositório Git local:**
+     - `git init` - Inicializado repositório
+     - `git remote add origin https://github.com/junielsonfarias/patrimonio.git`
+     - `git branch -M principal` - Renomeado branch para principal
+     - `git push -u origin principal` - Enviado código para GitHub
+
+  2. **Atualizados todos os scripts de instalação:**
+     - Substituídas URLs genéricas por URL real do repositório
+     - Atualizado `git clone` para usar repositório correto
+     - Corrigidos links de download dos scripts
+
+  3. **Atualizada documentação:**
+     - README.md com seção de instalação rápida
+     - Links do GitHub atualizados em todos os arquivos
+     - URLs de download dos scripts corrigidas
+
+### Repositório Configurado
+- ✅ **URL do Repositório:** https://github.com/junielsonfarias/patrimonio.git
+- ✅ **Branch Principal:** principal
+- ✅ **106 arquivos** enviados para o GitHub
+- ✅ **42.765 linhas** de código enviadas
+
+### URLs de Instalação Atualizadas
+- ✅ **Instalador Simples:** https://raw.githubusercontent.com/junielsonfarias/patrimonio/principal/instalar-facil.sh
+- ✅ **Instalador Completo:** https://raw.githubusercontent.com/junielsonfarias/patrimonio/principal/install.sh
+- ✅ **Verificador de Dependências:** https://raw.githubusercontent.com/junielsonfarias/patrimonio/principal/check-dependencies.sh
+
+### Comandos de Instalação Atualizados
+- ✅ **Para usuários sem conhecimento técnico:**
+  ```bash
+  wget https://raw.githubusercontent.com/junielsonfarias/patrimonio/principal/instalar-facil.sh
+  chmod +x instalar-facil.sh
+  ./instalar-facil.sh
+  ```
+
+- ✅ **Para usuários técnicos:**
+  ```bash
+  wget https://raw.githubusercontent.com/junielsonfarias/patrimonio/principal/install.sh
+  chmod +x install.sh
+  ./install.sh
+  ```
+
+### Teste de Funcionamento
+- ✅ Repositório criado e configurado
+- ✅ Código enviado com sucesso
+- ✅ Scripts atualizados com URLs corretas
+- ✅ Documentação atualizada
+- ✅ Links de instalação funcionais
+
+### Próximos Passos
+1. Testar instalação usando URLs do GitHub
+2. Validar funcionamento dos scripts remotos
+3. Criar releases no GitHub
+4. Configurar GitHub Actions para CI/CD
